@@ -2,7 +2,6 @@
   "name": "projeto18-linkr-back",
   "version": "1.0.0",
   "type": "module",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node src/server.js",
@@ -30,5 +29,6 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
-  }
+  },
+  "description": ""
 }
