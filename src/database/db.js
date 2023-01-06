@@ -8,7 +8,9 @@ export let connection;
 try {
    connection = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: true,
+    ssl: {
+        rejectUnauthorized: false
+    },
   });
 } catch (err) {
     console.log("Erro ao conectar no banco de dados: ", err);

@@ -5,7 +5,7 @@ export function getUserByEmail(email){
 }
 
 export function insertNewUser(username, email, encryptedPassword, pictureUrl){
-    return connection.query(`INSERT INTO users (username, email, password, "pictureUrl") VALUES ($1, $2, $3, $4)`, [username, email, encryptedPassword], pictureUrl);
+    return connection.query(`INSERT INTO users (username, email, password, "pictureUrl") VALUES ($1, $2, $3, $4)`, [username, email, encryptedPassword, pictureUrl]);
 }
 
 export function insertNewSession(userId, token){
