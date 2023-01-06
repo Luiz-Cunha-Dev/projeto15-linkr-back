@@ -1,12 +1,5 @@
 import { connection } from "../database/db.js";
 
-
-export function getUsersByName(username){
-    return connection.query(`SELECT id, username, "pictureUrl" FROM users WHERE username like $1`, [`${username}%`])
-}
-
-
-
 export function getUsersByName(name){
     return connection.query(`SELECT id, username, "pictureUrl" FROM users WHERE username like $1`, [`${name}%`])
 }
