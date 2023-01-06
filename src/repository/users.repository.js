@@ -5,6 +5,13 @@ export function getUsersByName(username){
     return connection.query(`SELECT id, username, "pictureUrl" FROM users WHERE username like $1`, [`${username}%`])
 }
 
+
+
+export function getUsersByName(name){
+    return connection.query(`SELECT id, username, "pictureUrl" FROM users WHERE username like $1`, [`${name}%`])
+}
+
+
 export function getPostById(id){
     return connection.query(`SELECT * FROM posts WHERE "userId" = $1`, [id])
 }
