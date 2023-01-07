@@ -1,9 +1,16 @@
 import { connection } from "../database/db.js";
 
-export function insertPost(userId, link, comments) {
+export function insertPost(userId, linkId, link, comments) {
   return connection.query(
-    `INSERT INTO posts ("userId", link, comment, likes, "usersLikesId" ) VALUES ($1, $2, $3, $4, $5);`,
-    [userId, link, comments, 0, 0]
+    `INSERT INTO posts ("userId", linkId, link, comment, likes, "usersLikesId" ) VALUES ($1, $2, $3, $4, $5, $6);`,
+    [userId, linkId, link, comments, 0, 0]
+  );
+}
+
+export function insertLink(title, description, url, image) {
+  return connection.query(
+    `INSERT INTO links ("linkTitle", "linkDescription", "linkUrl", "linkImage") VALUES ($1,$2,$3,$4) RETURNING id;`,
+    [title, description, url, image]
   );
 }
 
@@ -22,4 +29,46 @@ export function selectUserId(id) {
 
 export function deleteOnePost(id) {
   return connection.query(`DELETE FROM posts WHERE id=$1;`, [id]);
+}
+
+export function selectAllPosts() {
+  return connection.query(
+    `SELECT 
+  users.username,
+  users."pictureUrl", 
+  posts."likes",
+  posts.comments, 
+  links."linkTitle",
+  links."linkDescription", 
+  links."linkUrl", 
+  links."linkImage"
+  FROM posts 
+  JOIN users ON posts."userId"=users.id 
+  JOIN links ON posts."linkId"=links.id 
+  ORDER BY posts.id DESC
+  LIMIT 20
+  ;`
+  );
+}
+
+export function selectPostsById(userId) {
+  return connection.query(
+    `SELECT 
+  users.username,
+  users."pictureUrl", 
+  posts."likes",
+  posts.comments, 
+  links."linkTitle",
+  links."linkDescription", 
+  links."linkUrl", 
+  links."linkImage"
+  FROM posts 
+  JOIN users ON posts."userId"=users.id 
+  JOIN links ON posts."linkId"=links.id 
+  WHERE users.id=$1 
+  ORDER BY posts.id DESC
+  LIMIT 20
+  ;`,
+    [userId]
+  );
 }
