@@ -1,5 +1,5 @@
 
-import { getPostById, getUserbyId, getUsersByName } from "../repository/users.repository.js";
+import { getPostById, getUserbyId, getUsersByName, getSessionByToken } from "../repository/users.repository.js";
 
 export async function getUsers(req, res){
     const {username} = req.body;
@@ -25,6 +25,35 @@ export async function getPostByUser(req, res){
         const userPosts = await getPostById(id)
 
         user.rows[0].posts = userPosts.rows
+
+        res.send(user.rows[0]).status(200)
+
+    }catch(err){
+        console.log(err);
+        res.sendStatus(500)
+    }
+}
+
+export async function getUserData(req, res){
+    const { authorization } = req.headers;
+
+    if (!authorization) {
+      res.sendStatus(401);
+      return;
+    }
+
+    const token = authorization.replace("Bearer ", "");
+
+    try{
+        const session = await getSessionByToken(token);
+
+        if (session.rows.length === 0) {
+          res.sendStatus(401);
+          return;
+        }
+
+        const user = await getUserbyId(session.rows[0].userId);
+
 
         res.send(user.rows[0]).status(200)
 
