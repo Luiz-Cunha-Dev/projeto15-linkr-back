@@ -1,9 +1,9 @@
 import { connection } from "../database/db.js";
 
-export function insertPost(userId, linkId, link, comments) {
+export function insertPost(userId, linkId, comments) {
   return connection.query(
-    `INSERT INTO posts ("userId", linkId, link, comment, likes, "usersLikesId" ) VALUES ($1, $2, $3, $4, $5, $6);`,
-    [userId, linkId, link, comments, 0, 0]
+    `INSERT INTO posts ("userId", linkId, comment, likes, "usersLikesId" ) VALUES ($1, $2, $3, $4, $5);`,
+    [userId, linkId, comments, 0, 0]
   );
 }
 
