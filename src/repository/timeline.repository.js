@@ -1,12 +1,11 @@
 import { connection } from "../database/db.js";
 
-export function insertPost(userId, link, comments) {
+export function insertPost(userId, linkId, link, comments) {
   return connection.query(
-    `INSERT INTO posts ("userId", link, comment, likes, "usersLikesId" ) VALUES ($1, $2, $3, $4, $5);`,
-    [userId, link, comments, 0, 0]
+    `INSERT INTO posts ("userId", linkId, link, comment, likes, "usersLikesId" ) VALUES ($1, $2, $3, $4, $5, $6);`,
+    [userId, linkId, link, comments, 0, 0]
   );
 }
-
 
 export function insertLink(title, description, url, image) {
   return connection.query(
@@ -14,7 +13,6 @@ export function insertLink(title, description, url, image) {
     [title, description, url, image]
   );
 }
-
 
 export function insertUpdatedPost(comments, id) {
   return connection.query(`UPDATE posts SET comments=$1  WHERE posts.id=$2;`, [

@@ -41,7 +41,7 @@ export async function createPost(req, res) {
         );
         linkId = rows[0].id;
 
-        await insertPost(userId, linkId, comments);
+        await insertPost(userId, linkId, link,comments);
       })
       .catch((err) => {
         console.log(err);
