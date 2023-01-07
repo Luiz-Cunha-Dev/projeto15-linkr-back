@@ -1,8 +1,12 @@
 import { getSessionByToken } from "../repository/auth.repository.js";
+import urlMetaData from "url-metadata";
 import {
   deleteOnePost,
+  insertLink,
   insertPost,
   insertUpdatedPost,
+  selectAllPosts,
+  selectPostsById,
   selectUserId,
 } from "../repository/timeline.repository.js";
 
@@ -15,7 +19,9 @@ export async function createPost(req, res) {
   }
 
   const token = authorization.replace("Bearer ", "");
-  const post = req.res;
+
+  const { link, comments } = req.body;
+  let linkId;
   try {
     const session = await getSessionByToken(token);
 
@@ -24,12 +30,24 @@ export async function createPost(req, res) {
       return;
     }
     const userId = session.useId;
-    const link = post.link;
-    const comments = post.comments;
 
-    await insertPost(userId, link, comments);
+    urlMetaData(link)
+      .then(async (l) => {
+        const { rows } = await insertLink(
+          l.title,
+          l.description,
+          l.url,
+          l.image
+        );
+        linkId = rows[0].id;
 
-    res.sensStatus(201);
+        await insertPost(userId, linkId, comments);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    res.status(201).send("Post criado");
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -43,7 +61,7 @@ export async function updatePost(req, res) {
     return;
   }
   const token = authorization.replace("Bearer ", "");
-  const post = req.res; 
+  const post = req.res;
 
   try {
     const session = await getSessionByToken(token);
@@ -65,12 +83,11 @@ export async function updatePost(req, res) {
 
     await insertUpdatedPost(comments, id);
 
-    res.sensStatus(200);
+    res.sendStatus(200);
   } catch (err) {
     res.status(500).send(err.message);
   }
 }
-
 
 export async function deletePost(req, res) {
   const { authorization } = req.headers;
@@ -80,7 +97,7 @@ export async function deletePost(req, res) {
     return;
   }
   const token = authorization.replace("Bearer ", "");
-  const post = req.res; 
+  const post = req.res;
 
   try {
     const session = await getSessionByToken(token);
@@ -101,8 +118,59 @@ export async function deletePost(req, res) {
 
     await deleteOnePost(id);
 
-    res.sensStatus(200);
+    res.sendStatus(200);
   } catch (err) {
     res.status(500).send(err.message);
+  }
+}
+
+export async function getPosts(req, res) {
+
+    try {
+      const { rows } = await selectAllPosts();
+      const postsArray = rows.map((p) => {
+        return {
+          userName: p.username,
+          userImage: p.pictureUrl,
+          likesCount: p.likes,
+          postComment: p.comments,
+          linkInfo: {
+            linkTitle: p.linkTitle,
+            linkDescription: p.linkDescription,
+            linkUrl: p.linkUrl,
+            linkImage: p.linkImage,
+          },
+        };
+      });
+      res.send(postsArray);
+    } catch (err) {
+      res.status(500).send(err.message);
+      console.log(err.message);
+    }
+  }
+
+//Como usuário logado, quero ver os posts de um usuário na rota "/user/:id"
+export async function getPostsById(req, res) {
+  const { userId } = res.locals.user;
+  try {
+    const { rows } = await selectPostsById(userId);
+    const postsArray = rows.map((p) => {
+      return {
+        userName: p.username,
+        userImage: p.pictureUrl,
+        likesCount: p.likes,
+        postComment: p.comments,
+        linkInfo: {
+          linkTitle: p.linkTitle,
+          linkDescription: p.linkDescription,
+          linkUrl: p.linkUrl,
+          linkImage: p.linkImage,
+        },
+      };
+    });
+    res.send(postsArray );
+  } catch (err) {
+    res.status(500).send(err.message);
+    console.log(err.message);
   }
 }

@@ -7,6 +7,15 @@ export function insertPost(userId, link, comments) {
   );
 }
 
+
+export function insertLink(title, description, url, image) {
+  return connection.query(
+    `INSERT INTO links ("linkTitle", "linkDescription", "linkUrl", "linkImage") VALUES ($1,$2,$3,$4) RETURNING id;`,
+    [title, description, url, image]
+  );
+}
+
+
 export function insertUpdatedPost(comments, id) {
   return connection.query(`UPDATE posts SET comments=$1  WHERE posts.id=$2;`, [
     comments,
@@ -22,4 +31,46 @@ export function selectUserId(id) {
 
 export function deleteOnePost(id) {
   return connection.query(`DELETE FROM posts WHERE id=$1;`, [id]);
+}
+
+export function selectAllPosts() {
+  return connection.query(
+    `SELECT 
+  users.username,
+  users."pictureUrl", 
+  posts."likes",
+  posts.comments, 
+  links."linkTitle",
+  links."linkDescription", 
+  links."linkUrl", 
+  links."linkImage"
+  FROM posts 
+  JOIN users ON posts."userId"=users.id 
+  JOIN links ON posts."linkId"=links.id 
+  ORDER BY posts.id DESC
+  LIMIT 20
+  ;`
+  );
+}
+
+export function selectPostsById(userId) {
+  return connection.query(
+    `SELECT 
+  users.username,
+  users."pictureUrl", 
+  posts."likes",
+  posts.comments, 
+  links."linkTitle",
+  links."linkDescription", 
+  links."linkUrl", 
+  links."linkImage"
+  FROM posts 
+  JOIN users ON posts."userId"=users.id 
+  JOIN links ON posts."linkId"=links.id 
+  WHERE users.id=$1 
+  ORDER BY posts.id DESC
+  LIMIT 20
+  ;`,
+    [userId]
+  );
 }
