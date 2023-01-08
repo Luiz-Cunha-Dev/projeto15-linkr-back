@@ -12,7 +12,7 @@ import {
 
 export async function createPost(req, res) {
   const { authorization } = req.headers;
-
+  
   if (!authorization) {
     res.sendStatus(401);
     return;
@@ -135,6 +135,7 @@ export async function getPosts(req, res) {
         userImage: p.pictureUrl,
         likesCount: p.likes,
         postComment: p.comments,
+        postId: p.postId,
         linkInfo: {
           linkTitle: p.linkTitle,
           linkDescription: p.linkDescription,
