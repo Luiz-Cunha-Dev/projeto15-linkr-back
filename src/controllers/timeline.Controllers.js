@@ -84,7 +84,7 @@ export async function updatePost(req, res) {
 
     const postUserId = await selectUserId(id);
 
-    if (postUserId !== session.rows[0].userId) {
+    if (postUserId.rows[0].userId !== session.rows[0].userId) {
       res.sendStatus(401);
       return;
     }
@@ -134,8 +134,7 @@ export async function deletePost(req, res) {
 
 export async function getPosts(req, res) {
   try {
-  const { rows } = await selectAllPosts();
-   
+    const { rows } = await selectAllPosts();
 
     console.log("posts", rows);
     const postsArray = rows.map((p) => {
