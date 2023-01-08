@@ -1,18 +1,17 @@
 import dotenv from "dotenv";
 dotenv.config();
-import pg from 'pg';
+import pg from "pg";
 const { Pool } = pg;
 
 export let connection;
 
 try {
-   connection = new Pool({
+  connection = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
-        rejectUnauthorized: false
+      rejectUnauthorized: false,
     },
   });
 } catch (err) {
-    console.log("Erro ao conectar no banco de dados: ", err);
+  console.log("Erro ao conectar no banco de dados: ", err);
 }
-

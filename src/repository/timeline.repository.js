@@ -1,9 +1,9 @@
 import { connection } from "../database/db.js";
 
-export function insertPost(userId, linkId, link, comments) {
+export function insertPost(userId, linksId, comments) {
   return connection.query(
-    `INSERT INTO posts ("userId", linkId, link, comment, likes, "usersLikesId" ) VALUES ($1, $2, $3, $4, $5, $6);`,
-    [userId, linkId, link, comments, 0, 0]
+    `INSERT INTO posts ("userId", linksId, comment, likes, "usersLikesId" ) VALUES ($1, $2, $3, $4, $5);`,
+    [userId, linksId, comments, 0, 0]
   );
 }
 
@@ -44,7 +44,7 @@ export function selectAllPosts() {
   links."linkImage"
   FROM posts 
   JOIN users ON posts."userId"=users.id 
-  JOIN links ON posts."linkId"=links.id 
+  JOIN links ON posts."linksId"=links.id 
   ORDER BY posts.id DESC
   LIMIT 20
   ;`
@@ -64,7 +64,7 @@ export function selectPostsById(userId) {
   links."linkImage"
   FROM posts 
   JOIN users ON posts."userId"=users.id 
-  JOIN links ON posts."linkId"=links.id 
+  JOIN links ON posts."linksId"=links.id 
   WHERE users.id=$1 
   ORDER BY posts.id DESC
   LIMIT 20

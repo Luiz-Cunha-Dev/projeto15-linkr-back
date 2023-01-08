@@ -21,7 +21,7 @@ export async function createPost(req, res) {
   const token = authorization.replace("Bearer ", "");
 
   const { link, comments } = req.body;
-  let linkId;
+  let linksId;
   try {
     const session = await getSessionByToken(token);
 
@@ -39,9 +39,9 @@ export async function createPost(req, res) {
           l.url,
           l.image
         );
-        linkId = rows[0].id;
+        linksId = rows[0].id;
 
-        await insertPost(userId, linkId, link,comments);
+        await insertPost(userId, linksId, comments);
       })
       .catch((err) => {
         console.log(err);
@@ -61,7 +61,7 @@ export async function updatePost(req, res) {
     return;
   }
   const token = authorization.replace("Bearer ", "");
-  const post = req.res;
+  const post = req.body;
 
   try {
     const session = await getSessionByToken(token);
@@ -76,7 +76,7 @@ export async function updatePost(req, res) {
 
     const postUserId = await selectUserId(id);
 
-    if (postUserId !== session.useId) {
+    if (postUserId !== session.rows[0].userId) {
       res.sendStatus(401);
       return;
     }
@@ -97,7 +97,7 @@ export async function deletePost(req, res) {
     return;
   }
   const token = authorization.replace("Bearer ", "");
-  const post = req.res;
+  const post = req.data;
 
   try {
     const session = await getSessionByToken(token);
@@ -111,7 +111,7 @@ export async function deletePost(req, res) {
 
     const postUserId = await selectUserId(id);
 
-    if (postUserId !== session.useId) {
+    if (postUserId !== session.rows[0].userId) {
       res.sendStatus(401);
       return;
     }
