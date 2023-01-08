@@ -13,12 +13,14 @@ import {
 export async function createPost(req, res) {
   const { authorization } = req.headers;
 
+  console.log("authorization", authorization);
+
   if (!authorization) {
     res.sendStatus(401);
     return;
   }
 
-  const token = authorization.replace("Bearer ", "");
+  const token = authorization?.replace("Bearer ", "");
 
   const { link, comments } = req.body;
   let linksId;
