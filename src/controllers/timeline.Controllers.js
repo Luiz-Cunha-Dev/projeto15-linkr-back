@@ -44,9 +44,7 @@ export async function createPost(req, res) {
           l.image
         );
 
-        console.log("rows", rows[0]);
         linksId = rows[0].id;
-        console.log("linksId", linksId);
 
         await insertPost(userId, linksId, comments);
       })
@@ -54,7 +52,6 @@ export async function createPost(req, res) {
         console.log(err);
       });
 
-    console.log("userId, linksId, comments", userId, linksId, comments);
     res.status(201).send("Post criado");
   } catch (err) {
     res.status(500).send(err.message);
@@ -84,7 +81,7 @@ export async function updatePost(req, res) {
 
     const postUserId = await selectUserId(id);
 
-    if (postUserId !== session.rows[0].userId) {
+    if (postUserId.rows[0].userId !== session.rows[0].userId) {
       res.sendStatus(401);
       return;
     }
@@ -105,7 +102,7 @@ export async function deletePost(req, res) {
     return;
   }
   const token = authorization.replace("Bearer ", "");
-  const post = req.data;
+  const { id } = req.body;
 
   try {
     const session = await getSessionByToken(token);
@@ -115,11 +112,9 @@ export async function deletePost(req, res) {
       return;
     }
 
-    const id = post.id;
-
     const postUserId = await selectUserId(id);
 
-    if (postUserId !== session.rows[0].userId) {
+    if (postUserId.rows[0].userId !== session.rows[0].userId) {
       res.sendStatus(401);
       return;
     }
@@ -134,10 +129,8 @@ export async function deletePost(req, res) {
 
 export async function getPosts(req, res) {
   try {
-  const { rows } = await selectAllPosts();
-   
+    const { rows } = await selectAllPosts();
 
-    console.log("posts", rows);
     const postsArray = rows.map((p) => {
       return {
         userName: p.username,
