@@ -12,13 +12,13 @@ import {
 
 export async function createPost(req, res) {
   const { authorization } = req.headers;
-  
+
   if (!authorization) {
     res.sendStatus(401);
     return;
   }
 
-  const token = authorization.replace("Bearer ", "");
+  const token = authorization?.replace("Bearer ", "");
 
   const { link, comments } = req.body;
   let linksId;
@@ -30,8 +30,6 @@ export async function createPost(req, res) {
       return;
     }
     const userId = session.rows[0].userId;
-
-    console.log("userId, link, comments", userId, link, comments);
 
     await urlMetadata(link)
       .then(async (l) => {
@@ -45,12 +43,12 @@ export async function createPost(req, res) {
         linksId = rows[0].id;
 
         await insertPost(userId, linksId, comments);
+
+        res.status(201).send("Post criado");
       })
       .catch((err) => {
         console.log(err);
       });
-
-    res.status(201).send("Post criado");
   } catch (err) {
     res.status(500).send(err.message);
   }
