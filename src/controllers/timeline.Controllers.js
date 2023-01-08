@@ -33,8 +33,6 @@ export async function createPost(req, res) {
     }
     const userId = session.rows[0].userId;
 
-    console.log("userId, link, comments", userId, link, comments);
-
     await urlMetadata(link)
       .then(async (l) => {
         const { rows } = await insertLink(
@@ -47,12 +45,12 @@ export async function createPost(req, res) {
         linksId = rows[0].id;
 
         await insertPost(userId, linksId, comments);
+
+        res.status(201).send("Post criado");
       })
       .catch((err) => {
         console.log(err);
       });
-
-    res.status(201).send("Post criado");
   } catch (err) {
     res.status(500).send(err.message);
   }
