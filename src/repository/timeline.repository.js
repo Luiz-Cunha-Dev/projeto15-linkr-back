@@ -47,6 +47,7 @@ export function selectAllPosts() {
   users."pictureUrl", 
   posts."likes",
   posts.comments, 
+  posts.id AS postId,
   links."linkTitle",
   links."linkDescription", 
   links."linkUrl", 
