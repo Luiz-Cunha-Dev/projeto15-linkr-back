@@ -1,13 +1,15 @@
 import { getSessionByToken } from "../repository/auth.repository.js";
-import urlMetaData from "url-metadata";
+import urlMetadata from "url-metadata";
 import {
   deleteOnePost,
   insertLink,
   insertPost,
   insertUpdatedPost,
   selectAllPosts,
+  getAllPosts,
   selectPostsById,
   selectUserId,
+  getAllLinks,
 } from "../repository/timeline.repository.js";
 
 export async function createPost(req, res) {
@@ -29,9 +31,11 @@ export async function createPost(req, res) {
       res.sendStatus(401);
       return;
     }
-    const userId = session.useId;
+    const userId = session.rows[0].userId;
 
-    urlMetaData(link)
+    console.log("userId, link, comments", userId, link, comments);
+
+    await urlMetadata(link)
       .then(async (l) => {
         const { rows } = await insertLink(
           l.title,
@@ -39,7 +43,10 @@ export async function createPost(req, res) {
           l.url,
           l.image
         );
+
+        console.log("rows", rows[0]);
         linksId = rows[0].id;
+        console.log("linksId", linksId);
 
         await insertPost(userId, linksId, comments);
       })
@@ -47,6 +54,7 @@ export async function createPost(req, res) {
         console.log(err);
       });
 
+    console.log("userId, linksId, comments", userId, linksId, comments);
     res.status(201).send("Post criado");
   } catch (err) {
     res.status(500).send(err.message);
@@ -125,29 +133,31 @@ export async function deletePost(req, res) {
 }
 
 export async function getPosts(req, res) {
+  try {
+  const { rows } = await selectAllPosts();
+   
 
-    try {
-      const { rows } = await selectAllPosts();
-      const postsArray = rows.map((p) => {
-        return {
-          userName: p.username,
-          userImage: p.pictureUrl,
-          likesCount: p.likes,
-          postComment: p.comments,
-          linkInfo: {
-            linkTitle: p.linkTitle,
-            linkDescription: p.linkDescription,
-            linkUrl: p.linkUrl,
-            linkImage: p.linkImage,
-          },
-        };
-      });
-      res.send(postsArray);
-    } catch (err) {
-      res.status(500).send(err.message);
-      console.log(err.message);
-    }
+    console.log("posts", rows);
+    const postsArray = rows.map((p) => {
+      return {
+        userName: p.username,
+        userImage: p.pictureUrl,
+        likesCount: p.likes,
+        postComment: p.comments,
+        linkInfo: {
+          linkTitle: p.linkTitle,
+          linkDescription: p.linkDescription,
+          linkUrl: p.linkUrl,
+          linkImage: p.linkImage,
+        },
+      };
+    });
+    res.send(postsArray);
+  } catch (err) {
+    res.status(500).send(err.message);
+    console.log(err.message);
   }
+}
 
 //Como usuário logado, quero ver os posts de um usuário na rota "/user/:id"
 export async function getPostsById(req, res) {
@@ -168,7 +178,7 @@ export async function getPostsById(req, res) {
         },
       };
     });
-    res.send(postsArray );
+    res.send(postsArray);
   } catch (err) {
     res.status(500).send(err.message);
     console.log(err.message);

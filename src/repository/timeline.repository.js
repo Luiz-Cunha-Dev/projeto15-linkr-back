@@ -2,10 +2,11 @@ import { connection } from "../database/db.js";
 
 export function insertPost(userId, linksId, comments) {
   return connection.query(
-    `INSERT INTO posts ("userId", linksId, comment, likes, "usersLikesId" ) VALUES ($1, $2, $3, $4, $5);`,
-    [userId, linksId, comments, 0, 0]
+    `INSERT INTO posts ("userId", "linksId", comments, likes) VALUES ($1, $2, $3, $4);`,
+    [userId, linksId, comments, 0]
   );
 }
+
 
 export function insertLink(title, description, url, image) {
   return connection.query(
@@ -29,6 +30,14 @@ export function selectUserId(id) {
 
 export function deleteOnePost(id) {
   return connection.query(`DELETE FROM posts WHERE id=$1;`, [id]);
+}
+
+export function getAllPosts() {
+  return connection.query(`SELECT * FROM posts`);
+}
+
+export function getAllLinks() {
+  return connection.query(`SELECT * FROM links`);
 }
 
 export function selectAllPosts() {

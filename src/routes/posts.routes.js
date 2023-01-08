@@ -12,7 +12,7 @@ const postsRouter = Router();
 
 postsRouter.get("/timeline", getPosts);
 postsRouter.post("/timeline", schemaValidation(postsSchema), createPost);
-postsRouter.patch("/timeline"), updatePost;
+postsRouter.patch("/timeline", updatePost);
 postsRouter.delete("/timeline"), deletePost;
 
 export default postsRouter;
