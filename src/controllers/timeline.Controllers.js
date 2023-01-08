@@ -6,10 +6,8 @@ import {
   insertPost,
   insertUpdatedPost,
   selectAllPosts,
-  getAllPosts,
   selectPostsById,
   selectUserId,
-  getAllLinks,
 } from "../repository/timeline.repository.js";
 
 export async function createPost(req, res) {
