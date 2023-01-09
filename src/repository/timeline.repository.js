@@ -27,6 +27,14 @@ export function selectUserId(postId) {
   ]);
 }
 
+export function findLink(link){
+  return connection.query(`SELECT id FROM links WHERE links."linkUrl" = $1`, [
+    link,
+  ]);
+
+}
+
+
 export function deleteOnePost(postid) {
   return connection.query(`DELETE FROM posts WHERE id=$1;`, [postid]);
 }
