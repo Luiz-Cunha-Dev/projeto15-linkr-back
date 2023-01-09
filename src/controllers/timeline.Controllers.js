@@ -10,6 +10,7 @@ import {
   selectPostsById,
   selectUserId,
 } from "../repository/timeline.repository.js";
+import { connection } from "../database/db.js";
 
 export async function createPost(req, res) {
   const { authorization } = req.headers;
@@ -26,9 +27,13 @@ export async function createPost(req, res) {
 
   try {
     const session = await getSessionByToken(token);
-    const existingLink = await connection.query('SELECT * FROM links WHERE linkUrl=$1', [link])
 
-    if(!existingLink){
+    const existingLink = await connection.query(
+      `SELECT * FROM links WHERE "linkUrl"=$1`,
+      [link]
+    );
+
+    if (!existingLink) {
 
     }
     if (session.rows.length === 0) {
@@ -47,14 +52,16 @@ export async function createPost(req, res) {
         );
 
         linksId = rows[0].id;
-        
+
       })
       .catch((err) => {
         console.log(err);
       });
-      console.log("Dados link ====> ",userId, existingLink.rows[0].id, comments)
-      await insertPost(userId, existingLink.rows[0].id, comments);
-        res.status(201).send("Post criado");
+
+  
+    await insertPost(userId, existingLink.rows[0].id, comments);
+   res.status(201).send("Post criado");
+
   } catch (err) {
     console.log(err);
     res.status(500).send(err.message);
@@ -110,19 +117,16 @@ export async function deletePost(req, res) {
   try {
     const session = await getSessionByToken(token);
 
-
     if (session.rows.length === 0) {
       return res.send("Não existe sessão").status(401);
     }
 
-    const postUserId = await selectUserId(postId);
 
-    console.log(
-      "id do usuário do post",
-      typeof postUserId.rows[0].userId,
-      "id do usuário logado",
-      typeof session.rows[0].userId
-    );
+    const postUserId = await selectUserId(postid);
+
+    const postOwnerUserId = postUserId.rows[0].userId;
+    const loggedUserId = session.rows[0].userId;
+
 
     if (Number(postOwnerUserId) != Number(loggedUserId)) {
       res.send("usuário não é o mesmo do post a DELETAR").status(401);
