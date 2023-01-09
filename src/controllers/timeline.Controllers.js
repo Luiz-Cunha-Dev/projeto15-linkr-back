@@ -24,6 +24,12 @@ export async function createPost(req, res) {
 
   const { link, comments } = req.body;
   let linksId;
+  let comment = "";
+
+  if (comments) {
+    comment = comments;
+  }
+
   try {
     const session = await getSessionByToken(token);
 
@@ -44,7 +50,7 @@ export async function createPost(req, res) {
 
         linksId = rows[0].id;
 
-        await insertPost(userId, linksId, comments);
+        await insertPost(userId, linksId, comment);
 
         res.status(201).send("Post criado");
       })
