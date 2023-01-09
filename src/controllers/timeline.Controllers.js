@@ -98,6 +98,7 @@ export async function updatePost(req, res) {
 
 export async function deletePost(req, res) {
   const { authorization } = req.headers;
+  const { postId } = req.data;
 
   if (!authorization) {
     res.sendStatus(401);
@@ -105,8 +106,6 @@ export async function deletePost(req, res) {
   }
 
   const token = authorization?.replace("Bearer ", "");
-
-  const { postId } = req.body;
 
   try {
     const session = await getSessionByToken(token);
