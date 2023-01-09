@@ -127,7 +127,7 @@ export async function deletePost(req, res) {
     );
 
     if (Number(postUserId.rows[0].userId) !== Number(session.rows[0].userId)) {
-      res.send("usuário não é o mesmo do post a deletar").status(401);
+      res.send("usuário não é o mesmo do post a deletarrrrrr").status(401);
       return;
     }
 
