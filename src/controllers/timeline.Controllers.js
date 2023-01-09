@@ -1,4 +1,5 @@
 import { getSessionByToken } from "../repository/auth.repository.js";
+import { connection } from "../database/db.js";
 import urlMetadata from "url-metadata";
 import {
   deleteOnePost,
@@ -26,12 +27,14 @@ export async function createPost(req, res) {
 
   try {
     const session = await getSessionByToken(token);
+
     const existingLink = await connection.query(
       `SELECT * FROM links WHERE "linkUrl"=$1`,
       [link]
     );
 
     if (!existingLink) {
+
     }
     if (session.rows.length === 0) {
       res.sendStatus(401);
@@ -49,13 +52,16 @@ export async function createPost(req, res) {
         );
 
         linksId = rows[0].id;
+
       })
       .catch((err) => {
         console.log(err);
       });
+
   
     await insertPost(userId, existingLink.rows[0].id, comments);
    res.status(201).send("Post criado");
+
   } catch (err) {
     console.log(err);
     res.status(500).send(err.message);
@@ -115,10 +121,12 @@ export async function deletePost(req, res) {
       return res.send("Não existe sessão").status(401);
     }
 
+
     const postUserId = await selectUserId(postid);
 
     const postOwnerUserId = postUserId.rows[0].userId;
     const loggedUserId = session.rows[0].userId;
+
 
     if (Number(postOwnerUserId) != Number(loggedUserId)) {
       res.send("usuário não é o mesmo do post a DELETAR").status(401);
