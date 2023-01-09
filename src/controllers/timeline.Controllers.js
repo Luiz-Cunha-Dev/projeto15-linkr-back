@@ -101,6 +101,8 @@ export async function updatePost(req, res) {
 export async function deletePost(req, res) {
   const { authorization } = req.headers;
 
+  console.log("pauthorization", authorization);
+
   if (!authorization) {
     res.sendStatus(401);
     return;
@@ -108,8 +110,12 @@ export async function deletePost(req, res) {
   const token = authorization?.replace("Bearer ", "");
   const { postId } = req.body;
 
+  console.log("postId", postId);
+
   try {
     const session = await getSessionByToken(token);
+
+    console.log("session", session);
 
     if (session.rows.length === 0) {
       res.sendStatus(401);
@@ -117,6 +123,8 @@ export async function deletePost(req, res) {
     }
 
     const postUserId = await selectUserId(postId);
+
+    console.log("postUserid", postUserId);
 
     if (postUserId.rows[0].userId !== session.rows[0].userId) {
       res.sendStatus(401);
