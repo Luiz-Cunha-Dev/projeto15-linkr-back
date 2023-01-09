@@ -114,15 +114,20 @@ export async function deletePost(req, res) {
     console.log("session", session.rows[0]);
 
     if (session.rows.length === 0) {
-      res.send("Não existe sessão").tatus(401);
-      return;
+      return res.send("Não existe sessão").tatus(401);
     }
 
     const postUserId = await selectUserId(postId);
 
+    console.log(
+      "id do usuário do post",
+      postUserId.rows[0],
+      "id do usuário logado",
+      session.rows[0].userId
+    );
+
     if (postUserId.rows[0] !== session.rows[0].userId) {
-      res.send("usuário não é o mesmo do post a deletar").status(401);
-      return;
+      return res.send("usuário não é o mesmo do post a deletar").status(401);
     }
 
     await deleteOnePost(postId);
