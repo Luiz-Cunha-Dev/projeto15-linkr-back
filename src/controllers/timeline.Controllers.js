@@ -1,4 +1,5 @@
 import { getSessionByToken } from "../repository/auth.repository.js";
+import { connection } from "../database/db.js";
 import urlMetadata from "url-metadata";
 import {
   deleteOnePost,
@@ -25,7 +26,11 @@ export async function createPost(req, res) {
 
   try {
     const session = await getSessionByToken(token);
+    const existingLink = await connection.query('SELECT * FROM links WHERE linkUrl=$1', [link])
 
+    if(!existingLink){
+
+    }
     if (session.rows.length === 0) {
       res.sendStatus(401);
       return;
@@ -42,13 +47,14 @@ export async function createPost(req, res) {
         );
 
         linksId = rows[0].id;
-        await insertPost(userId, linksId, comments);
-
-        res.status(201).send("Post criado");
+        
       })
       .catch((err) => {
         console.log(err);
       });
+      console.log("Dados link ====> ",userId, existingLink.rows[0].id, comments)
+      await insertPost(userId, existingLink.rows[0].id, comments);
+        res.status(201).send("Post criado");
   } catch (err) {
     console.log(err);
     res.status(500).send(err.message);
