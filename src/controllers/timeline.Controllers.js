@@ -114,7 +114,7 @@ export async function deletePost(req, res) {
     console.log("session", session.rows[0]);
 
     if (session.rows.length === 0) {
-      res.sendStatus(401);
+      res.send("Não existe sessão").tatus(401);
       return;
     }
 
