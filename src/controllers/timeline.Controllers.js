@@ -22,11 +22,6 @@ export async function createPost(req, res) {
 
   const { link, comments } = req.body;
   let linksId;
-  let comment = "";
-
-  if (comments) {
-    comment = comments;
-  }
 
   try {
     const session = await getSessionByToken(token);
@@ -47,8 +42,7 @@ export async function createPost(req, res) {
         );
 
         linksId = rows[0].id;
-
-        await insertPost(userId, linksId, comment);
+        await insertPost(userId, linksId, comments);
 
         res.status(201).send("Post criado");
       })
@@ -56,6 +50,7 @@ export async function createPost(req, res) {
         console.log(err);
       });
   } catch (err) {
+    console.log(err);
     res.status(500).send(err.message);
   }
 }
@@ -99,8 +94,6 @@ export async function updatePost(req, res) {
 export async function deletePost(req, res) {
   const { authorization, postid } = req.headers;
 
-  console.log("postId", postid);
-
   if (!authorization) {
     res.sendStatus(401);
     return;
@@ -111,7 +104,6 @@ export async function deletePost(req, res) {
   try {
     const session = await getSessionByToken(token);
 
-    console.log("session", session.rows[0]);
 
     if (session.rows.length === 0) {
       return res.send("Não existe sessão").status(401);
@@ -119,12 +111,6 @@ export async function deletePost(req, res) {
 
     const postUserId = await selectUserId(postid);
 
-    console.log(
-      "id do usuário do post",
-      postUserId.rows[0].userId,
-      "id do usuário logado",
-      session.rows[0].userId
-    );
 
     const postOwnerUserId = postUserId.rows[0].userId;
     const loggedUserId = session.rows[0].userId;

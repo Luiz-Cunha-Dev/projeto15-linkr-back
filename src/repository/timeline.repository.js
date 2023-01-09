@@ -7,7 +7,6 @@ export function insertPost(userId, linksId, comments) {
   );
 }
 
-
 export function insertLink(title, description, url, image) {
   return connection.query(
     `INSERT INTO links ("linkTitle", "linkDescription", "linkUrl", "linkImage") VALUES ($1,$2,$3,$4) RETURNING id;`,
@@ -28,8 +27,8 @@ export function selectUserId(postId) {
   ]);
 }
 
-export function deleteOnePost(postId) {
-  return connection.query(`DELETE FROM posts WHERE id=$1;`, [postId]);
+export function deleteOnePost(postid) {
+  return connection.query(`DELETE FROM posts WHERE id=$1;`, [postid]);
 }
 
 export function getAllPosts() {
