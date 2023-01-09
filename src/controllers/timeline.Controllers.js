@@ -97,8 +97,9 @@ export async function updatePost(req, res) {
 }
 
 export async function deletePost(req, res) {
-  const { authorization } = req.headers;
-  const { postId } = req.data;
+  const { authorization, postid } = req.headers;
+
+  console.log("postId", postid);
 
   if (!authorization) {
     res.sendStatus(401);
@@ -116,7 +117,7 @@ export async function deletePost(req, res) {
       return res.send("Não existe sessão").status(401);
     }
 
-    const postUserId = await selectUserId(postId);
+    const postUserId = await selectUserId(postid);
 
     console.log(
       "id do usuário do post",
@@ -133,7 +134,7 @@ export async function deletePost(req, res) {
       return;
     }
 
-    await deleteOnePost(postId);
+    await deleteOnePost(postid);
 
     res.sendStatus(200);
   } catch (err) {
