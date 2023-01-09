@@ -13,8 +13,6 @@ import {
 export async function createPost(req, res) {
   const { authorization } = req.headers;
 
-  console.log("authorization", authorization);
-
   if (!authorization) {
     res.sendStatus(401);
     return;
@@ -101,13 +99,13 @@ export async function updatePost(req, res) {
 export async function deletePost(req, res) {
   const { authorization } = req.headers;
 
-  console.log("pauthorization", authorization);
-
   if (!authorization) {
     res.sendStatus(401);
     return;
   }
+
   const token = authorization?.replace("Bearer ", "");
+
   const { postId } = req.body;
 
   console.log("postId", postId);
@@ -115,10 +113,10 @@ export async function deletePost(req, res) {
   try {
     const session = await getSessionByToken(token);
 
-    console.log("session", session);
+    console.log("session", session.rows[0]);
 
     if (session.rows.length === 0) {
-      res.sendStatus(401);
+      res.send("não há sessão").status(401);
       return;
     }
 
@@ -127,7 +125,7 @@ export async function deletePost(req, res) {
     console.log("postUserid", postUserId.rows[0].userId);
 
     if (postUserId.rows[0].userId !== session.rows[0].userId) {
-      res.sendStatus(401);
+      res.send("usuário não é o mesmo do post a deletar").status(401);
       return;
     }
 
