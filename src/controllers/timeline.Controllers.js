@@ -121,12 +121,12 @@ export async function deletePost(req, res) {
 
     console.log(
       "id do usuário do post",
-      postUserId.rows[0],
+      postUserId.rows[0].userId,
       "id do usuário logado",
       session.rows[0].userId
     );
 
-    if (postUserId.rows[0] !== session.rows[0].userId) {
+    if (postUserId.rows[0].userId !== session.rows[0].userId) {
       return res.send("usuário não é o mesmo do post a deletar").status(401);
     }
 
