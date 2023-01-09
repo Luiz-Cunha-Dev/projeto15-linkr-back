@@ -22,9 +22,9 @@ export function insertUpdatedPost(comments, id) {
   ]);
 }
 
-export function selectUserId(id) {
+export function selectUserId(postId) {
   return connection.query(`SELECT posts."userId" FROM posts WHERE id = $1`, [
-    id,
+    postId,
   ]);
 }
 

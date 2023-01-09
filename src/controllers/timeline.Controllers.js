@@ -124,7 +124,7 @@ export async function deletePost(req, res) {
 
     const postUserId = await selectUserId(postId);
 
-    console.log("postUserid", postUserId);
+    console.log("postUserid", postUserId.rows[0].userId);
 
     if (postUserId.rows[0].userId !== session.rows[0].userId) {
       res.sendStatus(401);
