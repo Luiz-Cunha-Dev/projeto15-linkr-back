@@ -22,11 +22,6 @@ export async function createPost(req, res) {
 
   const { link, comments } = req.body;
   let linksId;
-  let comment = "";
-
-  if (comments) {
-    comment = comments;
-  }
 
   try {
     const session = await getSessionByToken(token);
@@ -47,8 +42,7 @@ export async function createPost(req, res) {
         );
 
         linksId = rows[0].id;
-
-        await insertPost(userId, linksId, comment);
+        await insertPost(userId, linksId, comments);
 
         res.status(201).send("Post criado");
       })
@@ -56,6 +50,7 @@ export async function createPost(req, res) {
         console.log(err);
       });
   } catch (err) {
+    console.log(err);
     res.status(500).send(err.message);
   }
 }
@@ -97,7 +92,7 @@ export async function updatePost(req, res) {
 }
 
 export async function deletePost(req, res) {
-  const { authorization } = req.headers;
+  const { authorization, postid } = req.headers;
 
   if (!authorization) {
     res.sendStatus(401);
@@ -106,18 +101,16 @@ export async function deletePost(req, res) {
 
   const token = authorization?.replace("Bearer ", "");
 
-  const { postId } = req.body;
-
   try {
     const session = await getSessionByToken(token);
 
-    console.log("session", session.rows[0]);
 
     if (session.rows.length === 0) {
       return res.send("Não existe sessão").status(401);
     }
 
     const postUserId = await selectUserId(postId);
+
     console.log(
       "id do usuário do post",
       typeof postUserId.rows[0].userId,
@@ -125,12 +118,12 @@ export async function deletePost(req, res) {
       typeof session.rows[0].userId
     );
 
-    if (Number(postUserId.rows[0].userId) !== Number(session.rows[0].userId)) {
-      res.send("usuário não é o mesmo do post a deletarrrrrr").status(401);
+    if (Number(postOwnerUserId) != Number(loggedUserId)) {
+      res.send("usuário não é o mesmo do post a DELETAR").status(401);
       return;
     }
 
-    await deleteOnePost(postId);
+    await deleteOnePost(postid);
 
     res.sendStatus(200);
   } catch (err) {
