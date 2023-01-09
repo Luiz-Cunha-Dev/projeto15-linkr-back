@@ -3,7 +3,7 @@ import { getPostByUser, getUserData, getUsers } from "../controllers/users.Contr
 
 const usersRouter = Router();
 
-usersRouter.post("/users", getUsers);
+usersRouter.get("/users", getUsers);
 
 usersRouter.get("/user/:id", getPostByUser);
 
