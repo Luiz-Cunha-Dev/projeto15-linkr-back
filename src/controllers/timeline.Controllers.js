@@ -118,7 +118,6 @@ export async function deletePost(req, res) {
     }
 
     const postUserId = await selectUserId(postId);
-
     console.log(
       "id do usuário do post",
       typeof postUserId.rows[0].userId,
