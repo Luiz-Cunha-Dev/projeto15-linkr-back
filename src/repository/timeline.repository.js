@@ -28,8 +28,8 @@ export function selectUserId(postId) {
   ]);
 }
 
-export function deleteOnePost(id) {
-  return connection.query(`DELETE FROM posts WHERE id=$1;`, [id]);
+export function deleteOnePost(postId) {
+  return connection.query(`DELETE FROM posts WHERE id=$1;`, [postId]);
 }
 
 export function getAllPosts() {
