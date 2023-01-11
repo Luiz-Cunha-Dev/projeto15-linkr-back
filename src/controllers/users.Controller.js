@@ -1,5 +1,5 @@
 
-import { getUserbyId, getUsersByName, getSessionByToken } from "../repository/users.repository.js";
+import {getUserbyId, getUsersByName, getSessionByToken } from "../repository/users.repository.js";
 
 export async function getUsers(req, res){
     const {username} = req.body;
@@ -15,6 +15,20 @@ export async function getUsers(req, res){
     }
 }
 
+
+export async function getUser(req, res){
+    const {id} = req.params;
+
+    try{
+        const user = await getUserbyId(id)
+
+        res.send(user.rows[0]).status(200)
+
+    }catch(err){
+        console.log(err);
+        res.sendStatus(500)
+    }
+}
 
 export async function getUserData(req, res){
     const { authorization } = req.headers;
