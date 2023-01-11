@@ -161,9 +161,9 @@ export async function getPosts(req, res) {
 
 //Como usuário logado, quero ver os posts de um usuário na rota "/user/:id"
 export async function getPostsById(req, res) {
-  const { userId } = res.locals.user;
+  const { id } = req.params;
   try {
-    const { rows } = await selectPostsById(userId);
+    const { rows } = await selectPostsById(id);
     const postsArray = rows.map((p) => {
       return {
         userName: p.username,
@@ -181,6 +181,6 @@ export async function getPostsById(req, res) {
     res.send(postsArray);
   } catch (err) {
     res.status(500).send(err.message);
-    console.log(err.message);
+    console.log(err);
   }
 }

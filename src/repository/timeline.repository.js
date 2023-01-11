@@ -49,7 +49,7 @@ export function getAllLinks() {
 
 export function selectAllPosts() {
   return connection.query(
-    `SELECT 
+    `SELECT
   users.username,
   users."pictureUrl", 
   posts."likes",
@@ -68,13 +68,14 @@ export function selectAllPosts() {
   );
 }
 
-export function selectPostsById(userId) {
+export function selectPostsById(id) {
   return connection.query(
-    `SELECT 
+    `SELECT
   users.username,
   users."pictureUrl", 
   posts."likes",
   posts.comments, 
+  posts.id AS "postId",
   links."linkTitle",
   links."linkDescription", 
   links."linkUrl", 
@@ -82,10 +83,10 @@ export function selectPostsById(userId) {
   FROM posts 
   JOIN users ON posts."userId"=users.id 
   JOIN links ON posts."linksId"=links.id 
-  WHERE users.id=$1 
+  WHERE users.id = $1 
   ORDER BY posts.id DESC
   LIMIT 20
   ;`,
-    [userId]
+    [id]
   );
 }
