@@ -68,7 +68,7 @@ export function selectAllPosts() {
   );
 }
 
-export function selectPostsById(userId) {
+export function selectPostsById(id) {
   return connection.query(
     `SELECT
   users.username,
@@ -87,6 +87,6 @@ export function selectPostsById(userId) {
   ORDER BY posts.id DESC
   LIMIT 20
   ;`,
-    [userId]
+    [id]
   );
 }
