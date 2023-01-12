@@ -10,6 +10,13 @@ import {
   selectPostsById,
   selectUserId,
 } from "../repository/timeline.repository.js";
+import {
+  checkHashtag,
+  getAllHashtags,
+  insertpostHashtags,
+  postHashtag,
+} from "../repository/hashtags.repository.js";
+import { hash } from "bcrypt";
 
 export async function createPost(req, res) {
   const { authorization } = req.headers;
@@ -39,7 +46,6 @@ export async function createPost(req, res) {
     const userId = session.rows[0].userId;
 
     if (existingLink.rows.length === 0) {
-      console.log("link novo");
       await urlMetadata(link)
         .then(async (l) => {
           const { rows } = await insertLink(
@@ -49,21 +55,47 @@ export async function createPost(req, res) {
             l.image
           );
 
-          console.log("link rows", rows[0].id);
           linksId = rows[0].id;
         })
         .catch((err) => {
           console.log(err);
         });
     } else {
-      console.log("link existente");
-      console.log("existinglink", existingLink.rows[0].id);
       linksId = existingLink.rows[0].id;
     }
 
-    console.log("linksid", linksId);
+    const postId = await insertPost(userId, linksId, comments);
 
-    await insertPost(userId, linksId, comments);
+    //começa a função das hashtags//
+
+    function filterHashtags(description) {
+      let arr = description.split(" ");
+      const hashtags = arr.filter((h) => {
+        if (h[0] === "#") {
+          return h;
+        }
+      });
+      return hashtags;
+    }
+
+    const hashtags = filterHashtags(comments);
+
+    hashtags.forEach(async (h) => {
+      const allHashtags = await getAllHashtags();
+
+      const hash = h.slice(1);
+
+      const hashtagExists = await checkHashtag(hash);
+
+      if (hashtagExists.rows.length > 0) {
+        await insertpostHashtags(postId.rows[0].id, hashtagExists.rows[0].id);
+      } else {
+        const { rows } = await postHashtag(h);
+
+        await insertpostHashtags(postId.rows[0].id, rows[0].id);
+      }
+    });
+
     res.status(201).send("Post criado");
   } catch (err) {
     console.log(err);
@@ -167,7 +199,6 @@ export async function getPosts(req, res) {
   }
 }
 
-//Como usuário logado, quero ver os posts de um usuário na rota "/user/:id"
 export async function getPostsById(req, res) {
   const { id } = req.params;
   try {
