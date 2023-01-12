@@ -32,30 +32,32 @@ export async function createPost(req, res) {
       [link]
     );
 
-    if (!existingLink) {
-    }
     if (session.rows.length === 0) {
       res.sendStatus(401);
       return;
     }
     const userId = session.rows[0].userId;
 
-    await urlMetadata(link)
-      .then(async (l) => {
-        const { rows } = await insertLink(
-          l.title,
-          l.description,
-          l.url,
-          l.image
-        );
+    if (existingLink.rows.length === 0) {
+      await urlMetadata(link)
+        .then(async (l) => {
+          const { rows } = await insertLink(
+            l.title,
+            l.description,
+            l.url,
+            l.image
+          );
 
-        linksId = rows[0].id;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+          linksId = rows[0].id;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      linksId = existingLink.rows[0].id;
+    }
 
-    await insertPost(userId, existingLink.rows[0].id, comments);
+    await insertPost(userId, linksId, comments);
     res.status(201).send("Post criado");
   } catch (err) {
     console.log(err);
@@ -64,7 +66,7 @@ export async function createPost(req, res) {
 }
 
 export async function updatePost(req, res) {
-  const { authorization } = req.headers;
+  const { authorization, postid } = req.headers;
 
   if (!authorization) {
     res.sendStatus(401);

@@ -15,7 +15,6 @@ export async function getUsers(req, res){
     }
 }
 
-
 export async function getUser(req, res){
     const {id} = req.params;
 
