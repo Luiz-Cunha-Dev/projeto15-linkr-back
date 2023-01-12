@@ -5,7 +5,7 @@ export function getUsersByName(name){
 }
 
 export function getUserbyId(id){
-    return connection.query(`SELECT username, "pictureUrl" FROM users WHERE id = $1`, [id])
+    return connection.query(`SELECT id, username, "pictureUrl" FROM users WHERE id = $1`, [id])
 }
 
 export function getSessionByToken(token){
