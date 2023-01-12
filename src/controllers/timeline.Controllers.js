@@ -39,6 +39,7 @@ export async function createPost(req, res) {
     const userId = session.rows[0].userId;
 
     if (existingLink.rows.length === 0) {
+      console.log("link novo");
       await urlMetadata(link)
         .then(async (l) => {
           const { rows } = await insertLink(
@@ -48,14 +49,19 @@ export async function createPost(req, res) {
             l.image
           );
 
+          console.log("link rows", rows[0].id);
           linksId = rows[0].id;
         })
         .catch((err) => {
           console.log(err);
         });
     } else {
+      console.log("link existente");
+      console.log("existinglink", existingLink.rows[0].id);
       linksId = existingLink.rows[0].id;
     }
+
+    console.log("linksid", linksId);
 
     await insertPost(userId, linksId, comments);
     res.status(201).send("Post criado");
