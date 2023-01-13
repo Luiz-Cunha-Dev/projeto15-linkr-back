@@ -179,6 +179,7 @@ export async function getPosts(req, res) {
 
     const postsArray = rows.map((p) => {
       return {
+        userId: p.id,
         userName: p.username,
         userImage: p.pictureUrl,
         likesCount: p.likes,

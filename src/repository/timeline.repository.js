@@ -50,6 +50,7 @@ export function getAllLinks() {
 export function selectAllPosts() {
   return connection.query(
     `SELECT
+  users.id,
   users.username,
   users."pictureUrl", 
   posts."likes",
