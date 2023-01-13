@@ -7,7 +7,6 @@ export function insertPost(userId, linksId, comments) {
   );
 }
 
-
 export function insertLink(title, description, url, image) {
   return connection.query(
     `INSERT INTO links ("linkTitle", "linkDescription", "linkUrl", "linkImage") VALUES ($1,$2,$3,$4) RETURNING id;`,
@@ -22,14 +21,22 @@ export function insertUpdatedPost(comments, id) {
   ]);
 }
 
-export function selectUserId(id) {
+export function selectUserId(postId) {
   return connection.query(`SELECT posts."userId" FROM posts WHERE id = $1`, [
-    id,
+    postId,
   ]);
 }
 
-export function deleteOnePost(id) {
-  return connection.query(`DELETE FROM posts WHERE id=$1;`, [id]);
+export function findLink(link){
+  return connection.query(`SELECT id FROM links WHERE links."linkUrl" = $1`, [
+    link,
+  ]);
+
+}
+
+
+export function deleteOnePost(postid) {
+  return connection.query(`DELETE FROM posts WHERE id=$1;`, [postid]);
 }
 
 export function getAllPosts() {
@@ -47,6 +54,7 @@ export function selectAllPosts() {
   users."pictureUrl", 
   posts."likes",
   posts.comments, 
+  posts.id AS "postId",
   links."linkTitle",
   links."linkDescription", 
   links."linkUrl", 

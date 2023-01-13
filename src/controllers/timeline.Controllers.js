@@ -1,4 +1,5 @@
 import { getSessionByToken } from "../repository/auth.repository.js";
+import { connection } from "../database/db.js";
 import urlMetadata from "url-metadata";
 import {
   deleteOnePost,
@@ -13,8 +14,6 @@ import {
 export async function createPost(req, res) {
   const { authorization } = req.headers;
 
-  console.log("authorization", authorization);
-
   if (!authorization) {
     res.sendStatus(401);
     return;
@@ -24,16 +23,22 @@ export async function createPost(req, res) {
 
   const { link, comments } = req.body;
   let linksId;
+
   try {
     const session = await getSessionByToken(token);
 
+    const existingLink = await connection.query(
+      `SELECT * FROM links WHERE "linkUrl"=$1`,
+      [link]
+    );
+
+    if (!existingLink) {
+    }
     if (session.rows.length === 0) {
       res.sendStatus(401);
       return;
     }
     const userId = session.rows[0].userId;
-
-    console.log("userId, link, comments", userId, link, comments);
 
     await urlMetadata(link)
       .then(async (l) => {
@@ -45,15 +50,15 @@ export async function createPost(req, res) {
         );
 
         linksId = rows[0].id;
-
-        await insertPost(userId, linksId, comments);
       })
       .catch((err) => {
         console.log(err);
       });
 
+    await insertPost(userId, existingLink.rows[0].id, comments);
     res.status(201).send("Post criado");
   } catch (err) {
+    console.log(err);
     res.status(500).send(err.message);
   }
 }
@@ -95,31 +100,33 @@ export async function updatePost(req, res) {
 }
 
 export async function deletePost(req, res) {
-  const { authorization } = req.headers;
+  const { authorization, postid } = req.headers;
 
   if (!authorization) {
     res.sendStatus(401);
     return;
   }
-  const token = authorization.replace("Bearer ", "");
-  const { id } = req.body;
+
+  const token = authorization?.replace("Bearer ", "");
 
   try {
     const session = await getSessionByToken(token);
 
     if (session.rows.length === 0) {
-      res.sendStatus(401);
+      return res.send("Não existe sessão").status(401);
+    }
+
+    const postUserId = await selectUserId(postid);
+
+    const postOwnerUserId = postUserId.rows[0].userId;
+    const loggedUserId = session.rows[0].userId;
+
+    if (Number(postOwnerUserId) != Number(loggedUserId)) {
+      res.send("usuário não é o mesmo do post a DELETAR").status(401);
       return;
     }
 
-    const postUserId = await selectUserId(id);
-
-    if (postUserId.rows[0].userId !== session.rows[0].userId) {
-      res.sendStatus(401);
-      return;
-    }
-
-    await deleteOnePost(id);
+    await deleteOnePost(postid);
 
     res.sendStatus(200);
   } catch (err) {
@@ -137,6 +144,7 @@ export async function getPosts(req, res) {
         userImage: p.pictureUrl,
         likesCount: p.likes,
         postComment: p.comments,
+        postId: p.postId,
         linkInfo: {
           linkTitle: p.linkTitle,
           linkDescription: p.linkDescription,
