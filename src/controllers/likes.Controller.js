@@ -7,14 +7,14 @@ export async function getLikes(req, res){
         const post = await getLikesByPostId(postId);
         console.log(post)
         if(post.rowCount === 0) {
-            return res.status(404).send("postId não Encontrado");
+            return res.status(404).send("postId não encontrado");
         }
         console.log(post.likes)
 
         const usernames = await getLastTwoUsernamesByPostId(postId);
         console.log(usernames)
         if(usernames.rowCount === 0) {
-            return res.status(404).send("usernames não Encontrados");
+            return res.status(404).send("usernames não encontrados");
         }
 
         res.send({
@@ -26,7 +26,7 @@ export async function getLikes(req, res){
         res.sendStatus(500)
     }
 }
-/*
+
 export async function postLikes(req, res){
     const { postId } = req.params;
 
@@ -34,14 +34,14 @@ export async function postLikes(req, res){
         const post = await getLikesByPostId(postId);
         console.log(post)
         if(post.rowCount === 0) {
-            return res.status(404).send("postId não Encontrado");
+            return res.status(404).send("postId não encontrado");
         }
         console.log(post.likes)
 
         const usernames = await getLastTwoUsernamesByPostId(postId);
         console.log(usernames)
         if(usernames.rowCount === 0) {
-            return res.status(404).send("usernames não Encontrados");
+            return res.status(404).send("usernames não encontrados");
         }
 
         res.send({
@@ -53,7 +53,6 @@ export async function postLikes(req, res){
         res.sendStatus(500)
     }
 }
-*/
 
 export async function deleteLikes(req, res){
     const { postId } = req.params;

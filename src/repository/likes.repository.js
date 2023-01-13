@@ -25,3 +25,33 @@ export function getLastTwoUsernamesByPostId(postId) {
       [postId]
     );
 }
+
+export function getLastTwoUsernamesByPostId(postId) {
+  return connection.query(
+    `SELECT 
+    "usersLikes".*,
+    users.username
+    FROM "usersLikes"
+        JOIN users ON "usersLikes"."userId"=users.id
+    WHERE "usersLikes"."postId"=$1
+    ORDER BY "usersLikes".id DESC
+    LIMIT 2
+  ;`,
+    [postId]
+  );
+}
+
+export function getLastTwoUsernamesByPostId(postId) {
+  return connection.query(
+    `SELECT 
+    "usersLikes".*,
+    users.username
+    FROM "usersLikes"
+        JOIN users ON "usersLikes"."userId"=users.id
+    WHERE "usersLikes"."postId"=$1
+    ORDER BY "usersLikes".id DESC
+    LIMIT 2
+  ;`,
+    [postId]
+  );
+}
