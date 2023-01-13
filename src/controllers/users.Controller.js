@@ -21,13 +21,18 @@ export async function getUsers(req, res){
         }
 
         const users = await getUsersByName(username)
-        const following = await getFollowById(users.rows[0].id, session.rows[0].userId) 
+        const following = await getFollowById(session.rows[0].userId) 
+        let followingIds = [];
+
+        following.rows.map(f => followingIds.push(f.userId))
         
-        if(following.rows.length !== 0){
-            users.rows[0].following = true
-        }else{
-            users.rows[0].following = false
-        }
+        users.rows.map(u => {
+            if(followingIds.includes(u.id)){
+                u.following = true
+            }else{
+                u.following = false
+            }
+        })
 
         res.send(users.rows).status(200)
 

@@ -12,6 +12,6 @@ export function getSessionByToken(token){
     return connection.query("SELECT * FROM sessions WHERE token = $1", [token])
 }
 
-export function getFollowById(id, userId){
-    return connection.query(`SELECT * FROM follows WHERE "userId" = $1 AND "followerId" = $2`, [id, userId])
+export function getFollowById(userId){
+    return connection.query(`SELECT "userId" FROM follows WHERE "followerId" = $1`, [userId])
 }
