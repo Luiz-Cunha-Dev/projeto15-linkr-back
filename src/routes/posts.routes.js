@@ -4,6 +4,7 @@ import {
   deletePost,
   getPosts,
   getPostsById,
+  getPostsFromPeopleYouFollow,
   updatePost,
 } from "../controllers/timeline.Controllers.js";
 import { schemaValidation } from "../middlewares/schemaValidation.middleware.js";
@@ -12,6 +13,7 @@ import { postsSchema } from "../models/schemas.js";
 const postsRouter = Router();
 
 postsRouter.get("/timeline", getPosts);
+postsRouter.get("/timeline/following", getPostsFromPeopleYouFollow);
 postsRouter.get("/timeline/:id", getPostsById);
 postsRouter.post("/timeline", schemaValidation(postsSchema), createPost);
 postsRouter.patch("/timeline", updatePost);

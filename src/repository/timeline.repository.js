@@ -69,6 +69,30 @@ export function selectAllPosts() {
   );
 }
 
+export function selectPostsfollowing(userId) {
+  return connection.query(
+    `SELECT
+  users.id,
+  users.username,
+  users."pictureUrl", 
+  posts."likes",
+  posts.comments, 
+  posts.id AS "postId",
+  links."linkTitle",
+  links."linkDescription", 
+  links."linkUrl", 
+  links."linkImage"
+  FROM posts 
+  JOIN users ON posts."userId"=users.id 
+  JOIN links ON posts."linksId"=links.id 
+  JOIN follows ON users.id = follows."userId"
+  WHERE follows."followerId" = $1
+  ORDER BY posts.id DESC
+  LIMIT 20
+  ;`, [userId]
+  );
+}
+
 export function selectPostsById(id) {
   return connection.query(
     `SELECT

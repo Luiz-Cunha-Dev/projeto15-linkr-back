@@ -8,6 +8,7 @@ import {
   insertUpdatedPost,
   selectAllPosts,
   selectPostsById,
+  selectPostsfollowing,
   selectUserId,
 } from "../repository/timeline.repository.js";
 import {
@@ -176,6 +177,47 @@ export async function deletePost(req, res) {
 export async function getPosts(req, res) {
   try {
     const { rows } = await selectAllPosts();
+
+    const postsArray = rows.map((p) => {
+      return {
+        userId: p.id,
+        userName: p.username,
+        userImage: p.pictureUrl,
+        likesCount: p.likes,
+        postComment: p.comments,
+        postId: p.postId,
+        linkInfo: {
+          linkTitle: p.linkTitle,
+          linkDescription: p.linkDescription,
+          linkUrl: p.linkUrl,
+          linkImage: p.linkImage,
+        },
+      };
+    });
+    res.send(postsArray);
+  } catch (err) {
+    res.status(500).send(err.message);
+    console.log(err.message);
+  }
+}
+
+export async function getPostsFromPeopleYouFollow (req, res){
+  const { authorization} = req.headers;
+
+  if (!authorization) {
+    res.sendStatus(401);
+    return;
+  }
+  const token = authorization.replace("Bearer ", "");
+
+  try {
+    const session = await getSessionByToken(token);
+
+    if (session.rows.length === 0) {
+      return res.status(401).send("Não existe sessão");
+    }
+
+    const { rows } = await selectPostsfollowing(session.rows[0].userId);
 
     const postsArray = rows.map((p) => {
       return {
