@@ -206,6 +206,7 @@ export async function getPostsById(req, res) {
     const { rows } = await selectPostsById(id);
     const postsArray = rows.map((p) => {
       return {
+        userId: p.id,
         userName: p.username,
         userImage: p.pictureUrl,
         likesCount: p.likes,

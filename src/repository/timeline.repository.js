@@ -72,6 +72,7 @@ export function selectAllPosts() {
 export function selectPostsById(id) {
   return connection.query(
     `SELECT
+  users.id,
   users.username,
   users."pictureUrl", 
   posts."likes",
