@@ -10,6 +10,13 @@ import {
   selectPostsById,
   selectUserId,
 } from "../repository/timeline.repository.js";
+import {
+  checkHashtag,
+  getAllHashtags,
+  insertpostHashtags,
+  postHashtag,
+} from "../repository/hashtags.repository.js";
+import { hash } from "bcrypt";
 
 export async function createPost(req, res) {
   const { authorization } = req.headers;
@@ -32,30 +39,63 @@ export async function createPost(req, res) {
       [link]
     );
 
-    if (!existingLink) {
-    }
     if (session.rows.length === 0) {
       res.sendStatus(401);
       return;
     }
     const userId = session.rows[0].userId;
 
-    await urlMetadata(link)
-      .then(async (l) => {
-        const { rows } = await insertLink(
-          l.title,
-          l.description,
-          l.url,
-          l.image
-        );
+    if (existingLink.rows.length === 0) {
+      await urlMetadata(link)
+        .then(async (l) => {
+          const { rows } = await insertLink(
+            l.title,
+            l.description,
+            l.url,
+            l.image
+          );
 
-        linksId = rows[0].id;
-      })
-      .catch((err) => {
-        console.log(err);
+          linksId = rows[0].id;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      linksId = existingLink.rows[0].id;
+    }
+
+    const postId = await insertPost(userId, linksId, comments);
+
+    //começa a função das hashtags//
+
+    function filterHashtags(description) {
+      let arr = description.split(" ");
+      const hashtags = arr.filter((h) => {
+        if (h[0] === "#") {
+          return h;
+        }
       });
+      return hashtags;
+    }
 
-    await insertPost(userId, existingLink.rows[0].id, comments);
+    const hashtags = filterHashtags(comments);
+
+    hashtags.forEach(async (h) => {
+      const allHashtags = await getAllHashtags();
+
+      const hash = h.slice(1);
+
+      const hashtagExists = await checkHashtag(hash);
+
+      if (hashtagExists.rows.length > 0) {
+        await insertpostHashtags(postId.rows[0].id, hashtagExists.rows[0].id);
+      } else {
+        const { rows } = await postHashtag(h);
+
+        await insertpostHashtags(postId.rows[0].id, rows[0].id);
+      }
+    });
+
     res.status(201).send("Post criado");
   } catch (err) {
     console.log(err);
@@ -64,7 +104,7 @@ export async function createPost(req, res) {
 }
 
 export async function updatePost(req, res) {
-  const { authorization } = req.headers;
+  const { authorization, postid } = req.headers;
 
   if (!authorization) {
     res.sendStatus(401);
@@ -113,7 +153,7 @@ export async function deletePost(req, res) {
     const session = await getSessionByToken(token);
 
     if (session.rows.length === 0) {
-      return res.send("Não existe sessão").status(401);
+      return res.status(401).send("Não existe sessão");
     }
 
     const postUserId = await selectUserId(postid);
@@ -122,12 +162,11 @@ export async function deletePost(req, res) {
     const loggedUserId = session.rows[0].userId;
 
     if (Number(postOwnerUserId) != Number(loggedUserId)) {
-      res.send("usuário não é o mesmo do post a DELETAR").status(401);
+      res.status(401).send("usuário não é o mesmo do post a DELETAR");
       return;
     }
 
     await deleteOnePost(postid);
-
     res.sendStatus(200);
   } catch (err) {
     res.status(500).send(err.message);
@@ -160,11 +199,10 @@ export async function getPosts(req, res) {
   }
 }
 
-//Como usuário logado, quero ver os posts de um usuário na rota "/user/:id"
 export async function getPostsById(req, res) {
-  const { userId } = res.locals.user;
+  const { id } = req.params;
   try {
-    const { rows } = await selectPostsById(userId);
+    const { rows } = await selectPostsById(id);
     const postsArray = rows.map((p) => {
       return {
         userName: p.username,
@@ -182,6 +220,6 @@ export async function getPostsById(req, res) {
     res.send(postsArray);
   } catch (err) {
     res.status(500).send(err.message);
-    console.log(err.message);
+    console.log(err);
   }
 }

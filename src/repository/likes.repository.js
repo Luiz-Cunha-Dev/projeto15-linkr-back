@@ -26,7 +26,7 @@ export function getLastTwoUsernamesByPostId(postId) {
     );
 }
 
-export function getLastTwoUsernamesByPostId(postId) {
+export function postUsernameByPostId(postId) {
   return connection.query(
     `SELECT 
     "usersLikes".*,
@@ -41,7 +41,7 @@ export function getLastTwoUsernamesByPostId(postId) {
   );
 }
 
-export function getLastTwoUsernamesByPostId(postId) {
+export function deleteUsernameByPostId(postId) {
   return connection.query(
     `SELECT 
     "usersLikes".*,
