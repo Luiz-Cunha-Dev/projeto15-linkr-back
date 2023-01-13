@@ -10,6 +10,13 @@ import {
   selectPostsById,
   selectUserId,
 } from "../repository/timeline.repository.js";
+import {
+  checkHashtag,
+  getAllHashtags,
+  insertpostHashtags,
+  postHashtag,
+} from "../repository/hashtags.repository.js";
+import { hash } from "bcrypt";
 
 export async function createPost(req, res) {
   const { authorization } = req.headers;
@@ -57,7 +64,38 @@ export async function createPost(req, res) {
       linksId = existingLink.rows[0].id;
     }
 
-    await insertPost(userId, linksId, comments);
+    const postId = await insertPost(userId, linksId, comments);
+
+    //começa a função das hashtags//
+
+    function filterHashtags(description) {
+      let arr = description.split(" ");
+      const hashtags = arr.filter((h) => {
+        if (h[0] === "#") {
+          return h;
+        }
+      });
+      return hashtags;
+    }
+
+    const hashtags = filterHashtags(comments);
+
+    hashtags.forEach(async (h) => {
+      const allHashtags = await getAllHashtags();
+
+      const hash = h.slice(1);
+
+      const hashtagExists = await checkHashtag(hash);
+
+      if (hashtagExists.rows.length > 0) {
+        await insertpostHashtags(postId.rows[0].id, hashtagExists.rows[0].id);
+      } else {
+        const { rows } = await postHashtag(h);
+
+        await insertpostHashtags(postId.rows[0].id, rows[0].id);
+      }
+    });
+
     res.status(201).send("Post criado");
   } catch (err) {
     console.log(err);
@@ -161,7 +199,6 @@ export async function getPosts(req, res) {
   }
 }
 
-//Como usuário logado, quero ver os posts de um usuário na rota "/user/:id"
 export async function getPostsById(req, res) {
   const { id } = req.params;
   try {
