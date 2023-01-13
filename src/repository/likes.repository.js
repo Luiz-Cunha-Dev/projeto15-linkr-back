@@ -26,32 +26,21 @@ export function getLastTwoUsernamesByPostId(postId) {
     );
 }
 
-export function postUsernameByPostId(postId) {
+export function postUserLike(userId, postId) {
   return connection.query(
-    `SELECT 
-    "usersLikes".*,
-    users.username
-    FROM "usersLikes"
-        JOIN users ON "usersLikes"."userId"=users.id
-    WHERE "usersLikes"."postId"=$1
-    ORDER BY "usersLikes".id DESC
-    LIMIT 2
+    `INSERT INTO "usersLikes"(
+      "userId", "postId")
+      VALUES ($1, $2);
   ;`,
-    [postId]
+    [userId, postId]
   );
 }
 
-export function deleteUsernameByPostId(postId) {
+export function deleteUserLike(userId, postId) {
   return connection.query(
-    `SELECT 
-    "usersLikes".*,
-    users.username
-    FROM "usersLikes"
-        JOIN users ON "usersLikes"."userId"=users.id
-    WHERE "usersLikes"."postId"=$1
-    ORDER BY "usersLikes".id DESC
-    LIMIT 2
+    `DELETE FROM "usersLikes"
+      WHERE "usersLikes"."userId"=$1 AND "usersLikes"."postId"=$2;
   ;`,
-    [postId]
+  [userId, postId]
   );
 }
