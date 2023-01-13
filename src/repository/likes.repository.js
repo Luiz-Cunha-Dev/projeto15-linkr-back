@@ -1,7 +1,7 @@
 import { connection } from "../database/db.js";
 
-export function getLikesByPostId(postId) {
-    return connection.query(
+export async function getLikesByPostId(postId) {
+    return await connection.query(
       `SELECT 
       posts.likes
       FROM posts 
@@ -11,8 +11,8 @@ export function getLikesByPostId(postId) {
     );
 }
 
-export function getLastTwoUsernamesByPostId(postId) {
-    return connection.query(
+export async function getLastTwoUsernamesByPostId(postId) {
+    return await connection.query(
       `SELECT 
       "usersLikes".*,
       users.username
@@ -26,8 +26,8 @@ export function getLastTwoUsernamesByPostId(postId) {
     );
 }
 
-export function postUserLike(userId, postId) {
-  return connection.query(
+export async function postUserLike(userId, postId) {
+  return await connection.query(
     `INSERT INTO "usersLikes"(
       "userId", "postId")
       VALUES ($1, $2);
@@ -36,8 +36,8 @@ export function postUserLike(userId, postId) {
   );
 }
 
-export function deleteUserLike(userId, postId) {
-  return connection.query(
+export async function deleteUserLike(userId, postId) {
+  return await connection.query(
     `DELETE FROM "usersLikes"
       WHERE "usersLikes"."userId"=$1 AND "usersLikes"."postId"=$2;
   ;`,

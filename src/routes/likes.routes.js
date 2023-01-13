@@ -4,7 +4,7 @@ import { getLikes, postLikes, deleteLikes } from "../controllers/likes.Controlle
 const likesRouter = Router();
 
 likesRouter.get("/likes/:postId", getLikes);
-likesRouter.post("/likes/:postId", postLikes);
-likesRouter.delete("/likes/:postId", deleteLikes);
+likesRouter.post("/likes/:userId/:postId", postLikes);
+likesRouter.delete("/likes/:userId/:postId", deleteLikes);
 
 export default likesRouter;

@@ -2,10 +2,11 @@ import { getLikesByPostId, getLastTwoUsernamesByPostId, deleteUserLike, postUser
 
 export async function getLikes(req, res){
     const { postId } = req.params;
-
+    console.log(postId)
     try{
         const post = await getLikesByPostId(postId);
         console.log(post)
+
         if(post.rowCount === 0) {
             return res.status(404).send("postId não encontrado");
         }
@@ -21,6 +22,7 @@ export async function getLikes(req, res){
             post: post.rows,
             usernamesLastTwoLikes: usernames.rows
         })
+        res.sendStatus(200)
     }catch(err){
         console.log(err);
         res.sendStatus(500)
@@ -28,7 +30,7 @@ export async function getLikes(req, res){
 }
 
 export async function postLikes(req, res){
-    const { userId, postId } = req.params;
+    const { userId, postId } = req.body;
 
     try{
         const insertLike = await postUserLike(userId, postId);
@@ -58,7 +60,7 @@ export async function postLikes(req, res){
 }
 
 export async function deleteLikes(req, res){
-    const { userId, postId } = req.params;
+    const { userId, postId } = req.body;
 
     try{
         const deleteLike = await deleteUserLike(userId, postId);
